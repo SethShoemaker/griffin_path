@@ -10,6 +10,11 @@
         "noEmitOnError": true
     },
     "include": [
-        "src"
+        "migrations",
+        "knexfile.ts",
+        "auth",
+        "routers",
+        "app.ts",
+        "main.ts"
     ]
 }

@@ -32,19 +32,19 @@ export class Section {
         return [...this.tags];
     }
 
-    protected _academicYearText: string;
-    public get academicYearText(): string {
-        return this._academicYearText;
+    protected _academicYear: string;
+    public get academicYear(): string {
+        return this._academicYear;
     }
 
-    protected _academicTermText: string;
-    public get academicTermText(): string {
-        return this._academicTermText;
+    protected _academicTerm: string;
+    public get academicTerm(): string {
+        return this._academicTerm;
     }
 
-    protected _titleText: string;
-    public get titleText(): string {
-        return this._titleText;
+    protected _title: string;
+    public get title(): string {
+        return this._title;
     }
 
     protected _meetingsText: string;
@@ -69,9 +69,9 @@ export class Section {
         termCode: string,
         credits: number,
         tags: SectionTag[],
-        academicYearText: string,
-        academicTermText: string,
-        titleText: string,
+        academicYear: string,
+        academicTerm: string,
+        title: string,
         meetingsText: string,
         instructorText: string,
         openSeatsText: string,
@@ -82,9 +82,9 @@ export class Section {
         this._termCode = termCode;
         this._credits = credits;
         this._tags = tags;
-        this._academicYearText = academicYearText;
-        this._academicTermText = academicTermText;
-        this._titleText = titleText;
+        this._academicYear = academicYear;
+        this._academicTerm = academicTerm;
+        this._title = title;
         this._meetingsText = meetingsText;
         this._instructorText = instructorText;
         this._openSeatsText = openSeatsText;

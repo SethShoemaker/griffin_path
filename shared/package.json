@@ -13,8 +13,8 @@
   "author": "",
   "license": "ISC",
   "packageManager": "pnpm@10.29.3",
-  "dependencies": {
-    "tsc": "^2.0.4",
+  "devDependencies": {
+    "@types/node": "^25.2.3",
     "typescript": "^5.9.3"
   }
 }

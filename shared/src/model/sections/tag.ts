@@ -1,7 +1,7 @@
 export class SectionTag {
 
-    protected _sisId: string|null;
-    public get sisId(): string|null {
+    protected _sisId: string;
+    public get sisId(): string {
         return this._sisId;
     }
 
@@ -16,7 +16,7 @@ export class SectionTag {
     }
 
     public constructor(
-        sisId: string|null,
+        sisId: string,
         name: string,
         displayPublically: boolean
     ) {

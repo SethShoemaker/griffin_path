@@ -1,9 +1,11 @@
+import dotenv from 'dotenv';
+dotenv.config({quiet: true})
 import bodyParser from "body-parser";
 import express from 'express';
 import { app } from "./app";
 import cookieParser from "cookie-parser";
+import { sisIngestRouter } from "./routers/sisIngest";
 
-const PORT = 3334;
 
 (async () => {
     try {
@@ -11,8 +13,10 @@ const PORT = 3334;
         app.use(express.json())
         app.use(cookieParser())
 
-        app.listen(PORT, () => {
-            console.log(`Server is running on http://localhost:${PORT}`);
+        app.use('/sisIngest', sisIngestRouter)
+
+        app.listen(process.env.PORT, () => {
+            console.log(`Server is running on http://localhost:${process.env.PORT}`);
         })
 
     } catch (e) {
