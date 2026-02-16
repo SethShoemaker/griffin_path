@@ -9,6 +9,15 @@
     "build": "tsc",
     "dev": "tsc --watch"
   },
+  "exports": {
+    ".": {
+      "import": "./build/index.js",
+      "types": "./build/index.d.ts"
+    }
+  },
+  "files": [
+    "build"
+  ],
   "keywords": [],
   "author": "",
   "license": "ISC",
