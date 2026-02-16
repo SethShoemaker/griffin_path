@@ -10,6 +10,7 @@
         "noEmitOnError": true
     },
     "include": [
-        "src"
+        "src",
+        "sections"
     ]
 }
