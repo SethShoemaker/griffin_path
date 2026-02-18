@@ -1,3 +1,3 @@
 build/
-data/
+local_data/
 .env

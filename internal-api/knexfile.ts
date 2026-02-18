@@ -5,7 +5,7 @@ export const config: { [key: string]: Knex.Config } = {
   development: {
     client: "better-sqlite3",
     connection: {
-      filename: "./data/classmap.sqlite3"
+      filename: "./local_data/classmap.db"
     },
     useNullAsDefault: true,
   },
