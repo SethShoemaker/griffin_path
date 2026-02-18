@@ -33,7 +33,7 @@ sisIngestRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (reque
         const sections: Array<any> = result.data;
 
         const sectionInserts = sections.map(s => ({ id: s.id }));
-        if (sectionInserts.length > 0) await trx("section").insert(sectionInserts);
+        if (sectionInserts.length > 0) await knex.batchInsert("section", sectionInserts, 100).transacting(trx);
 
         const sectionFieldValueInserts = sections.flatMap(s => {
             const fields = [];
@@ -47,11 +47,12 @@ sisIngestRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (reque
             }
             return fields;
         });
-        if (sectionFieldValueInserts.length > 0) await trx("section_field_value").insert(sectionFieldValueInserts);
+        if (sectionFieldValueInserts.length > 0) await knex.batchInsert("section_field_value", sectionFieldValueInserts, 100).transacting(trx);
 
         await trx.commit();
         res.json(await getSectionsInfo(knex));
     } catch (e) {
+        res.status(500).send("internal error");
         await trx.rollback();
     }
 })
