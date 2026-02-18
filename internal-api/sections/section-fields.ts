@@ -85,7 +85,7 @@ export function convertSectionFieldTypeToZod(sectionFieldType: SectionFieldType)
         case SectionFieldType.text:
             return z.string();
         case SectionFieldType.number:
-            return z.number();
+            return z.coerce.number();
         case SectionFieldType.checkbox:
             return z.boolean();
         case SectionFieldType.date:
