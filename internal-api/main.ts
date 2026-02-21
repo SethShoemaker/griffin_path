@@ -2,7 +2,7 @@ import dotenv from 'dotenv';
 dotenv.config({ quiet: true })
 import express from 'express';
 import { app } from "./app";
-import { sisIngestRouter } from "./routers/sisIngest";
+import { sisIngestRouter } from "./routers/sis-ingest";
 import { configRouter } from './routers/config';
 
 (async () => {
