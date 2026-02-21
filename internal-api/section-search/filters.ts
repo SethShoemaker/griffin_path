@@ -1,8 +1,16 @@
 import { Knex } from "knex";
-import { sectionSearchFilterType } from "./filter-type";
+import { SectionSearchFilterType, sectionSearchFilterType } from "./filter-type";
 
-export async function getSectionSearchFilters(knex: Knex | Knex.Transaction): Promise<Record<string, any>[]> {
-    return knex
+export type SectionSearchFilter = {
+    name: string,
+    slug: string,
+    type: SectionSearchFilterType,
+    data: Record<string, any>
+};
+
+export async function getSectionSearchFilters(knex: Knex | Knex.Transaction): Promise<SectionSearchFilter[]> {
+
+    return await knex
         .table("section_search_filter")
         .leftJoin("section_search_text_search_filter", "section_search_filter.name", "=", "section_search_text_search_filter.filter_name")
         .leftJoin("section_search_multi_select_or_filter", "section_search_filter.name", "=", "section_search_multi_select_or_filter.filter_name")
@@ -20,31 +28,40 @@ export async function getSectionSearchFilters(knex: Knex | Knex.Transaction): Pr
             "section_search_text_search_filter.field_name AS text_search_filter_field_name",
             "section_search_multi_select_or_filter.field_name AS multi_select_or_filter_field_name"
         ])
-        .then(rows => rows.map(row => {
+        .then(rows => Promise.all(rows.map(async row => {
 
-            const genericInfo = {
-                name: row.filter_name,
-                slug: row.filter_slug,
-                type: row.filter_type,
-            };
-
-            let typeInfo: object;
+            let type: SectionSearchFilterType;
+            let data: Record<string, any>;
 
             switch (row.filter_type) {
                 case sectionSearchFilterType.textSearch.id:
-                    typeInfo = {
-                        field: row.text_search_filter_field_name
-                    };
+                    type = sectionSearchFilterType.textSearch;
+                    data = {
+                        fieldName: row.text_search_filter_field_name
+                    }
                     break;
                 case sectionSearchFilterType.multiSelectOr.id:
-                    typeInfo = {
-                        field: row.multi_select_or_filter_field_name
-                    };
+                    type = sectionSearchFilterType.multiSelectOr;
+                    data = {
+                        fieldName: row.multi_select_or_filter_field_name,
+                        inputOptions: await knex
+                            .table("section_field_value")
+                            .where("field_name", "=", row.multi_select_or_filter_field_name)
+                            .orderBy("value")
+                            .distinct()
+                            .select("value")
+                            .then(rows => rows.map(row => row.value))
+                    }
                     break;
                 default:
                     throw new Error(`unhandled section search filter type: ${row.filter_type}`)
             };
 
-            return {...genericInfo, ...typeInfo};
-        }));
+            return {
+                name: row.filter_name,
+                slug: row.filter_slug,
+                type: type,
+                data: data
+            }
+        })));
 }

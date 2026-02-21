@@ -1,6 +1,8 @@
 import { SectionFieldType } from "../sections/type";
 
-export const sectionSearchFilterType = {
+export type SectionSearchFilterType = { id: string, label: string, description: string, fieldTypes: Array<any> };
+
+export const sectionSearchFilterType: Record<string, SectionSearchFilterType> = {
     textSearch: {
         id: "text_search",
         label: "Text Search",
