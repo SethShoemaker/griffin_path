@@ -1,8 +1,6 @@
 import { Knex } from "knex";
 import { sectionSearchFilterType } from "./filter-type";
 
-type Filter
-
 export async function getSectionSearchFilters(knex: Knex | Knex.Transaction): Promise<Record<string,any>[]> {
 
     return await knex
