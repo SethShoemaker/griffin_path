@@ -2,9 +2,10 @@ import z from "zod";
 import { SectionFieldType } from "./type";
 import { Knex } from "knex";
 
-export async function getSectionFieldsInfo(knex: Knex | Knex.Transaction): Promise<{ name: string, type: SectionFieldType, public: boolean, unique: boolean, required: boolean }[]> {
-    const rows = await knex<{ name: string, type: string, public: number, unique: number, required: number }>("section_field")
+export async function getSectionFieldsInfo(knex: Knex | Knex.Transaction): Promise<{ id: number, name: string, type: SectionFieldType, public: boolean, unique: boolean, required: boolean }[]> {
+    const rows = await knex<{ id: number, name: string, type: string, public: number, unique: number, required: number }>("section_field")
         .select([
+            "id",
             "name",
             "type",
             "public",
@@ -12,7 +13,8 @@ export async function getSectionFieldsInfo(knex: Knex | Knex.Transaction): Promi
             "required"
         ]);
 
-    rows.push({
+    rows.unshift({
+        id: 0,
         "name": "id",
         "type": "text",
         "public": 0,
@@ -21,6 +23,7 @@ export async function getSectionFieldsInfo(knex: Knex | Knex.Transaction): Promi
     });
 
     return rows.map(r => ({
+        id: r.id,
         name: r.name,
         type: SectionFieldType[r.type as keyof typeof SectionFieldType],
         public: r.public == 1,
@@ -101,17 +104,19 @@ export function convertSectionFieldTypeToZod(sectionFieldType: SectionFieldType)
 
 export async function getNumberSectionFieldUsages(fieldName: string, knex: Knex | Knex.Transaction): Promise<number> {
     return Number((await knex
-        .table("section_field_usage")
-        .where("field_name", "=", fieldName)
+        .table('section_field')
+        .innerJoin("section_field_usage", "section_field.id", "=", "section_field_usage.field_id")
+        .where("section_field.name", "=", fieldName)
         .count("* as count")
     )[0].count);
 }
 
 export async function getNumberPublicSectionFieldUsages(fieldName: string, knex: Knex | Knex.Transaction): Promise<number> {
     return Number((await knex
-        .table("section_field_usage")
-        .where("field_name", "=", fieldName)
-        .where("public", "=", true)
+        .table('section_field')
+        .innerJoin("section_field_usage", "section_field.id", "=", "section_field_usage.field_id")
+        .where("section_field.name", "=", fieldName)
+        .where("section_field.public", "=", true)
         .count("* as count")
     )[0].count);
 }

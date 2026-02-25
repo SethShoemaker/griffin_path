@@ -50,7 +50,8 @@ erDiagram
     }
 
     section_field {
-        string name PK
+        int id PK
+        string name UK
         string type
         bool unique
         bool required
@@ -61,19 +62,21 @@ erDiagram
     section_field ||--|{ section_field_value : "a section field value references the field which is being filled"
     section_field_value {
         string section_id PK,FK
-        string field_name PK,FK
+        int field_id PK,FK
         string value
     }
 
     section_field ||--|{ section_field_usage : "a section field usage references the field that is being used"
     section_field_usage {
-        string id PK
-        string field_name FK
+        int id PK
+        int field_id FK
+        bool public
         string description
     }
 
     section_search_filter {
-        string name PK
+        int id PK
+        string name UK
         string slug UK
         int position UK
         string type
@@ -82,26 +85,27 @@ erDiagram
     section_field_usage ||--o| section_search_filter_section_field_usage : "the link between a section search filter and its field usages"
     section_search_filter ||--|{ section_search_filter_section_field_usage : "the link between a section search filter and its field usages"
     section_search_filter_section_field_usage {
-        string filter_name PK,FK
-        string field_usage_id PK,FK
+        int filter_id PK,FK
+        int field_usage_id PK,FK
     }
 
     section_search_filter ||--o| section_search_text_search_filter : "if a filter is a text search filter, it will have a text search filter row"
     section_field ||--o| section_search_text_search_filter : "the link between a text search filter and the field"
     section_search_text_search_filter {
-        string filter_name PK,FK
-        string field_name FK
+        int filter_id PK,FK
+        int field_id FK
     }
 
     section_search_filter ||--o| section_search_multi_select_or_filter : "if a filter is a multi select or, it will have a text search filter row"
     section_field ||--o| section_search_multi_select_or_filter : "the link between a multi select or filter and the field"
     section_search_multi_select_or_filter {
-        string filter_name PK,FK
-        string field_name FK
+        int filter_id PK,FK
+        int field_id FK
     }
 
     section_search_column {
-        string name PK
+        int id PK
+        string name UK
         int position UK
         string type
     }
@@ -109,15 +113,15 @@ erDiagram
     section_field_usage ||--o| section_search_column_section_field_usage : "the link between a section search column and its field usages"
     section_search_column ||--|{ section_search_column_section_field_usage : "the link between a section search column and its field usages"
     section_search_column_section_field_usage {
-        string column_name PK,FK
-        string field_usage_id PK,FK
+        int column_id PK,FK
+        int field_usage_id PK,FK
     }
 
     section_search_column ||--o| section_search_basic_column : "if a column is a basic column, it will have a basic column row"
     section_field ||--o| section_search_basic_column : "the link between a basic search column and the field"
     section_search_basic_column {
-        string column_name PK,FK
-        string field_name FK
+        int column_id PK,FK
+        int field_id FK
     }
 ```
 

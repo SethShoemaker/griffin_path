@@ -4,23 +4,24 @@ import type { Knex } from "knex";
 export async function up(knex: Knex): Promise<void> {
     return knex.schema
         .createTable("section_search_filter", (table) => {
-            table.string("name").notNullable().primary();
+            table.integer('id').primary().notNullable();
+            table.string("name").notNullable().unique();
             table.string("slug").notNullable().unique();
             table.integer("position").checkPositive().unique().notNullable();
             table.string("type").notNullable();
         })
         .createTable("section_search_filter_section_field_usage", (table) => {
-            table.string("filter_name").notNullable().references("section_search_filter.name");
+            table.integer("filter_id").notNullable().references("section_search_filter.id");
             table.string("field_usage_id").notNullable().references("section_field_usage.id");
-            table.primary(["filter_name", "field_usage_id"]);
+            table.primary(["filter_id", "field_usage_id"]);
         })
         .createTable("section_search_text_search_filter", (table) => {
-            table.string("filter_name").primary().notNullable().references("section_search_filter.name");
-            table.string("field_name").notNullable().references("section_field.name");
+            table.integer("filter_id").primary().notNullable().references("section_search_filter.id");
+            table.string("field_id").notNullable().references("section_field.id");
         })
         .createTable("section_search_multi_select_or_filter", (table) => {
-            table.string("filter_name").primary().notNullable().references("section_search_filter.name");
-            table.string("field_name").notNullable().references("section_field.name");
+            table.integer("filter_id").primary().notNullable().references("section_search_filter.id");
+            table.string("field_id").notNullable().references("section_field.id");
         });
 }
 

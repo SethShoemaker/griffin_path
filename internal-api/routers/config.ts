@@ -135,7 +135,14 @@ configRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (request:
         }
 
         if (deletes.length > 0) {
-            await trx("section_field_value").whereIn("field_name", deletes).delete();
+            await trx
+                .table("section_field_value")
+                .whereIn("field_id", trx
+                    .table("section_field")
+                    .whereIn("name", deletes)
+                    .select("id")
+                )
+                .delete();
             await trx("section_field").whereIn("name", deletes).delete();
         }
 
@@ -145,7 +152,8 @@ configRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (request:
         await trx.commit();
         res.json(await getSectionFieldsInfo(knex));
 
-    } catch {
+    } catch (e) {
+        res.status(500).send();
         await trx.rollback();
     }
 });

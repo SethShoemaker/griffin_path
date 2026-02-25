@@ -35,14 +35,19 @@ sisIngestRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (reque
         const sectionInserts = sections.map(s => ({ id: s.id }));
         if (sectionInserts.length > 0) await knex.batchInsert("section", sectionInserts, 100).transacting(trx);
 
-        const sectionFieldValueInserts = sections.flatMap(s => {
-            const fields = [];
-            for (const key in s) {
-                if (key == "id") continue;
+        const fieldNameToIdMap = await trx
+            .table("section_field")
+            .select<{ id: number, name: string }[]>(["id", "name"])
+            .then(rows => rows.reduce((map: Map<string, number>, row) => map.set(row.name, row.id), new Map));
+
+        const sectionFieldValueInserts = sections.flatMap(section => {
+            const fields = new Array<{ section_id: number, field_id: number, value: string | null }>();
+            for (const fieldName in section) {
+                if (fieldName == "id") continue;
                 fields.push({
-                    section_id: s.id,
-                    field_name: key,
-                    value: s[key]
+                    section_id: section.id,
+                    field_id: fieldNameToIdMap.get(fieldName),
+                    value: section[fieldName]
                 })
             }
             return fields;

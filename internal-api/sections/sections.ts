@@ -6,7 +6,7 @@ import { Knex } from "knex";
 export async function getSectionsInfo(knex: Knex | Knex.Transaction): Promise<Record<string, any>[]> {
     const rows = await knex("section")
         .joinRaw("JOIN section_field")
-        .joinRaw("LEFT JOIN section_field_value ON section.id = section_field_value.section_id AND section_field.name = section_field_value.field_name")
+        .joinRaw("LEFT JOIN section_field_value ON section.id = section_field_value.section_id AND section_field.id = section_field_value.field_id")
         .select([
             "section.id",
             "section_field.name",

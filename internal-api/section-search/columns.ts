@@ -4,20 +4,24 @@ import { sectionSearchColumnType } from "./column-type";
 export async function getSectionSearchColumns(knex: Knex | Knex.Transaction): Promise<Record<string, any>[]> {
     return knex
         .table("section_search_column")
-        .leftJoin("section_search_basic_column", "section_search_column.name", "=", "section_search_basic_column.column_name")
+        .leftJoin("section_search_basic_column", "section_search_column.id", "=", "section_search_basic_column.column_id")
+        .leftJoin("section_field AS basic_field", "section_search_basic_column.field_id", "=", "basic_field.id")
         .orderBy("section_search_column.position")
         .select<{
+            column_id: number,
             column_name: string,
             column_type: string,
             basic_column_field_name: string,
         }[]>([
+            "section_search_column.id AS column_id",
             "section_search_column.name AS column_name",
             "section_search_column.type AS column_type",
-            "section_search_basic_column.field_name AS basic_column_field_name",
+            "basic_field.name AS basic_column_field_name",
         ])
         .then(rows => rows.map(row => {
 
             const genericInfo = {
+                id: row.column_id,
                 name: row.column_name,
                 type: row.column_type,
             };
