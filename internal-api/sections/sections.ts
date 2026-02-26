@@ -5,7 +5,7 @@ import { Knex } from "knex";
 import { tableName } from "../helpers/database-tables";
 
 export async function getSectionsInfo(knex: Knex | Knex.Transaction): Promise<Record<string, any>[]> {
-    const rows = await knex(tableName("section"))
+    const rows = await knex<{ id: number, name: string, required: boolean, type: string, value: string | null }[]>(tableName("section"))
         .join(tableName("section_field"), "section.id", "=", "section.id")
         .leftJoin(tableName("section_field_value"), (join) => {
             join.on("section.id", "=", "section_field_value.section_id");
@@ -19,21 +19,19 @@ export async function getSectionsInfo(knex: Knex | Knex.Transaction): Promise<Re
             "section_field_value.value",
         ]);
 
-    return Object.entries(Object.groupBy(rows, row => row.id))
-        .map(group => {
-            const section: Record<string, any> = {
-                id: group[0]
-            }
-            for (const row of group[1]!) {
-                if (row["name"] != null) {
-                    const sectionFieldType = SectionFieldType[row["type"] as keyof typeof SectionFieldType];
-                    let zod = convertSectionFieldTypeToZod(sectionFieldType);
-                    if (row["required"] != 1) zod = z.nullable(zod);
-                    section[row["name"]] = zod.parse(row["value"]);
-                }
-            }
-            return section;
-        });
+    const sections: Record<string, Record<string, any>> = {};
+
+    for (const row of rows) {
+        sections[row.id] ??= { id: row.id };
+        if (row["name"] != null) {
+            const sectionFieldType = SectionFieldType[row["type"] as keyof typeof SectionFieldType];
+            let zod = convertSectionFieldTypeToZod(sectionFieldType);
+            if (row["required"] != 1) zod = z.nullable(zod);
+            sections[row.id][row["name"]] = zod.parse(row["value"]);
+        }
+    }
+
+    return Object.values(sections);
 }
 
 export async function anySectionsExist(knex: Knex | Knex.Transaction): Promise<boolean> {
