@@ -32,4 +32,4 @@ export const config: { [key: string]: Knex.Config } = {
 };
 export default config;
 
-export const knex = _knex(config["development"]);
+export const knex = _knex(config["production"]);

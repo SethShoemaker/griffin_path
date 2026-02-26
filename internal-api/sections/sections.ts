@@ -2,11 +2,15 @@ import { SectionFieldType } from "./type";
 import { convertSectionFieldTypeToZod } from "./section-fields";
 import z from "zod";
 import { Knex } from "knex";
+import { tableName } from "../helpers/database-tables";
 
 export async function getSectionsInfo(knex: Knex | Knex.Transaction): Promise<Record<string, any>[]> {
-    const rows = await knex("section")
-        .joinRaw("JOIN section_field")
-        .joinRaw("LEFT JOIN section_field_value ON section.id = section_field_value.section_id AND section_field.id = section_field_value.field_id")
+    const rows = await knex(tableName("section"))
+        .join(tableName("section_field"), "section.id", "=", "section.id")
+        .leftJoin(tableName("section_field_value"), (join) => {
+            join.on("section.id", "=", "section_field_value.section_id");
+            join.on("section_field.id", "=", "section_field_value.field_id")
+        })
         .select([
             "section.id",
             "section_field.name",
@@ -33,12 +37,12 @@ export async function getSectionsInfo(knex: Knex | Knex.Transaction): Promise<Re
 }
 
 export async function anySectionsExist(knex: Knex | Knex.Transaction): Promise<boolean> {
-    const numSections = Number((await knex("section").count("* as count"))[0].count);
+    const numSections = Number((await knex(tableName("section")).count("* as count"))[0].count);
     return numSections > 0;
 }
 
 export async function sectionFieldHasAnyDuplicates(fieldName: string, knex: Knex | Knex.Transaction): Promise<boolean> {
-    const dupCheck = await knex("section_field_value")
+    const dupCheck = await knex(tableName("section_field_value"))
         .where("field_name", '=', fieldName)
         .groupBy("value")
         .havingRaw("COUNT(section_id) > 1",)
@@ -48,8 +52,8 @@ export async function sectionFieldHasAnyDuplicates(fieldName: string, knex: Knex
 }
 
 export async function sectionWithoutFieldExists(fieldName: string, knex: Knex | Knex.Transaction): Promise<boolean> {
-    const sectionMissingField = await knex("section")
-        .joinRaw("LEFT JOIN section_field_value ON section.id = section_field_value.section_id AND section_field_value.field_name = ?", fieldName)
+    const sectionMissingField = await knex(tableName("section"))
+        .joinRaw("LEFT JOIN " + tableName("section_field_value") + " ON section.id = section_field_value.section_id AND section_field_value.field_name = ?", fieldName)
         .whereNull('section_field_value.value')
         .select("section.id")
         .first();

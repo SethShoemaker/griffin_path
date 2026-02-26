@@ -4,6 +4,7 @@ import z from "zod";
 import { knex } from "../knexfile";
 import { getSectionFieldsAsZodSchema } from "../sections/section-fields";
 import { getSectionsInfo } from "../sections/sections";
+import { tableName } from "../helpers/database-tables";
 
 export const sisIngestRouter = express.Router();
 
@@ -27,16 +28,16 @@ sisIngestRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (reque
     const trx = await knex.transaction()
 
     try {
-        await trx.table("section_field_value").delete();
-        await trx.table("section").delete();
+        await trx.table(tableName("section_field_value")).delete();
+        await trx.table(tableName("section")).delete();
 
         const sections: Array<any> = result.data;
 
         const sectionInserts = sections.map(s => ({ id: s.id }));
-        if (sectionInserts.length > 0) await knex.batchInsert("section", sectionInserts, 100).transacting(trx);
+        if (sectionInserts.length > 0) await knex.batchInsert(tableName("section"), sectionInserts, 100).transacting(trx);
 
         const fieldNameToIdMap = await trx
-            .table("section_field")
+            .table(tableName("section_field"))
             .select<{ id: number, name: string }[]>(["id", "name"])
             .then(rows => rows.reduce((map: Map<string, number>, row) => map.set(row.name, row.id), new Map));
 
@@ -46,13 +47,13 @@ sisIngestRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (reque
                 if (fieldName == "id") continue;
                 fields.push({
                     section_id: section.id,
-                    field_id: fieldNameToIdMap.get(fieldName),
-                    value: section[fieldName]
+                    field_id: fieldNameToIdMap.get(fieldName)!,
+                    value: section[fieldName] ? section[fieldName].toString() : null
                 })
             }
             return fields;
         });
-        if (sectionFieldValueInserts.length > 0) await knex.batchInsert("section_field_value", sectionFieldValueInserts, 100).transacting(trx);
+        if (sectionFieldValueInserts.length > 0) await trx.batchInsert(tableName("section_field_value"), sectionFieldValueInserts, 100);
 
         await trx.commit();
         res.json(await getSectionsInfo(knex));

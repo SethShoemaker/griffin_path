@@ -1,14 +1,15 @@
 import { Knex } from "knex";
 import { sectionSearchFilterType } from "./filter-type";
+import { tableName } from "../helpers/database-tables";
 
 export async function getSectionSearchFilters(knex: Knex | Knex.Transaction): Promise<Record<string,any>[]> {
 
     return await knex
-        .table("section_search_filter")
-        .leftJoin("section_search_text_search_filter", "section_search_filter.id", "=", "section_search_text_search_filter.filter_id")
-        .leftJoin("section_field AS text_search_field", "section_search_text_search_filter.field_id", "=", "text_search_field.id")
-        .leftJoin("section_search_multi_select_or_filter", "section_search_filter.id", "=", "section_search_multi_select_or_filter.filter_id")
-        .leftJoin("section_field AS multi_select_or_field", "section_search_multi_select_or_filter.field_id", "=", "multi_select_or_field.id")
+        .table(tableName("section_search_filter"))
+        .leftJoin(tableName("section_search_text_search_filter"), "section_search_filter.id", "=", "section_search_text_search_filter.filter_id")
+        .leftJoin(tableName("section_field AS text_search_field"), "section_search_text_search_filter.field_id", "=", "text_search_field.id")
+        .leftJoin(tableName("section_search_multi_select_or_filter"), "section_search_filter.id", "=", "section_search_multi_select_or_filter.filter_id")
+        .leftJoin(tableName("section_field AS multi_select_or_field"), "section_search_multi_select_or_filter.field_id", "=", "multi_select_or_field.id")
         .orderBy("section_search_filter.position")
         .select<{
             filter_id: number,
@@ -39,8 +40,8 @@ export async function getSectionSearchFilters(knex: Knex | Knex.Transaction): Pr
                     typeInfo = {
                         fieldName: row.multi_select_or_filter_field_name,
                         inputOptions: await knex
-                            .table("section_field_value")
-                            .innerJoin("section_field", "section_field_value.field_id", "=", "section_field.id")
+                            .table(tableName("section_field_value"))
+                            .innerJoin(tableName("section_field"), "section_field_value.field_id", "=", "section_field.id")
                             .where("section_field.name", "=", row.multi_select_or_filter_field_name)
                             .orderBy("value")
                             .distinct()

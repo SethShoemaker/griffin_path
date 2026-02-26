@@ -8,6 +8,7 @@ import { anySectionsExist, sectionFieldHasAnyDuplicates, sectionWithoutFieldExis
 import { UpdateCollector } from "../helpers/updateCollector";
 import { getSectionSearchFilters } from "../section-search/filters";
 import { getSectionSearchColumns } from "../section-search/columns";
+import { tableName } from "../helpers/database-tables";
 
 export const configRouter = express.Router();
 
@@ -38,7 +39,7 @@ configRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (request:
         const oldFields = await getSectionFieldsInfo(trx);
 
         const issues = new Array<z.core.$ZodIssue>();
-        const updateCollector = new UpdateCollector(trx, "section_field", "name");
+        const updateCollector = new UpdateCollector(trx, tableName("section_field"), "name");
         const inserts = new Array<{ name: string, type: string, public: boolean, unique: boolean, required: boolean }>();
 
         for (const [newFieldIndex, newField] of newFields.entries()) {
@@ -136,23 +137,24 @@ configRouter.post('/sections', maybeAttachApiKey, requireApiKey, async (request:
 
         if (deletes.length > 0) {
             await trx
-                .table("section_field_value")
+                .table(tableName("section_field_value"))
                 .whereIn("field_id", trx
-                    .table("section_field")
+                    .table(tableName("section_field"))
                     .whereIn("name", deletes)
                     .select("id")
                 )
                 .delete();
-            await trx("section_field").whereIn("name", deletes).delete();
+            await trx(tableName("section_field")).whereIn("name", deletes).delete();
         }
 
-        if (inserts.length > 0) await trx("section_field").insert(inserts);
+        if (inserts.length > 0) await trx(tableName("section_field")).insert(inserts);
         if (updateCollector.hasUpdates()) await updateCollector.execute();
 
         await trx.commit();
         res.json(await getSectionFieldsInfo(knex));
 
     } catch (e) {
+        console.log(e)
         res.status(500).send();
         await trx.rollback();
     }

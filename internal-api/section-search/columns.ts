@@ -1,11 +1,12 @@
 import { Knex } from "knex";
 import { sectionSearchColumnType } from "./column-type";
+import { tableName } from "../helpers/database-tables";
 
 export async function getSectionSearchColumns(knex: Knex | Knex.Transaction): Promise<Record<string, any>[]> {
     return knex
-        .table("section_search_column")
-        .leftJoin("section_search_basic_column", "section_search_column.id", "=", "section_search_basic_column.column_id")
-        .leftJoin("section_field AS basic_field", "section_search_basic_column.field_id", "=", "basic_field.id")
+        .table(tableName("section_search_column"))
+        .leftJoin(tableName("section_search_basic_column"), "section_search_column.id", "=", "section_search_basic_column.column_id")
+        .leftJoin(tableName("section_field AS basic_field"), "section_search_basic_column.field_id", "=", "basic_field.id")
         .orderBy("section_search_column.position")
         .select<{
             column_id: number,
