@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { maybeAttachApiKey, requireApiKey } from "../auth/apiKey";
+import { maybeAttachApiKey, requireApiKey } from "../auth/api-key";
 import z from "zod";
 import { knex } from "../knexfile";
 import { getSectionFieldsAsZodSchema } from "../sections/section-fields";

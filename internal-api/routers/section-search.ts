@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import { maybeAttachApiKey, requireApiKey } from "../auth/apiKey";
+import { maybeAttachApiKey, requireApiKey } from "../auth/api-key";
 import { sectionSearchFilterType } from "../section-search/filter-type";
 import { queryParamValueArray } from "../helpers/query-params";
 import { getSectionSearchFilters } from "../section-search/filters";

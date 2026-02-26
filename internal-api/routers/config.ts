@@ -1,11 +1,11 @@
 import express, { Request, Response } from "express";
-import { maybeAttachApiKey, requireApiKey } from "../auth/apiKey";
+import { maybeAttachApiKey, requireApiKey } from "../auth/api-key";
 import { SectionFieldType } from "../sections/type";
 import * as z from "zod";
 import { knex } from "../knexfile";
 import { getNumberPublicSectionFieldUsages, getNumberSectionFieldUsages, getSectionFieldsInfo } from "../sections/section-fields";
 import { anySectionsExist, sectionFieldHasAnyDuplicates, sectionWithoutFieldExists } from "../sections/sections";
-import { UpdateCollector } from "../helpers/updateCollector";
+import { UpdateCollector } from "../helpers/database-update-collector";
 import { getSectionSearchFilters } from "../section-search/filters";
 import { getSectionSearchColumns } from "../section-search/columns";
 import { tableName } from "../helpers/database-tables";
