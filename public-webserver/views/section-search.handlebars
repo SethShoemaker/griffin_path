@@ -34,6 +34,32 @@
 
     </form>
 
+    <div class="flex justify-center mt-6">
+        <div class="join">
+
+            <button class="join-item btn {{#if (lte page 1)}}btn-disabled{{/if}}"
+                onclick="gotoPage({{subtract page 1}})">
+                ‹
+            </button>
+
+            {{#each (array 0 1 2 3 4)}}
+            {{#with (add (max 1 (min (subtract ../page 2) (subtract ../totalPages 4))) this)}}
+            {{#if (and (gte this 1) (lte this ../../totalPages))}}
+            <button class="join-item btn {{#if (eq this ../../page)}}btn-active{{/if}}" onclick="gotoPage({{this}})">
+                {{this}}
+            </button>
+            {{/if}}
+            {{/with}}
+            {{/each}}
+
+            <button class="join-item btn {{#if (gte page totalPages)}}btn-disabled{{/if}}"
+                onclick="gotoPage({{add page 1}})">
+                ›
+            </button>
+
+        </div>
+    </div>
+
     <div class="overflow-x-auto">
         <table class="table table-zebra w-full">
 
@@ -63,5 +89,40 @@
 
         </table>
     </div>
+
+    <div class="flex justify-center mt-6">
+        <div class="join">
+
+            <button class="join-item btn {{#if (lte page 1)}}btn-disabled{{/if}}"
+                onclick="gotoPage({{subtract page 1}})">
+                ‹
+            </button>
+
+            {{#each (array 0 1 2 3 4)}}
+            {{#with (add (max 1 (min (subtract ../page 2) (subtract ../totalPages 4))) this)}}
+            {{#if (and (gte this 1) (lte this ../../totalPages))}}
+            <button class="join-item btn {{#if (eq this ../../page)}}btn-active{{/if}}" onclick="gotoPage({{this}})">
+                {{this}}
+            </button>
+            {{/if}}
+            {{/with}}
+            {{/each}}
+
+            <button class="join-item btn {{#if (gte page totalPages)}}btn-disabled{{/if}}"
+                onclick="gotoPage({{add page 1}})">
+                ›
+            </button>
+
+        </div>
+    </div>
+
+    <script>
+        function gotoPage(page) {
+            const params = new URLSearchParams(window.location.search);
+            params.set("page", page);
+            params.set("per_page", {{ perPage }});
+            window.location.search = params.toString();
+        }
+    </script>
 
 </div>
