@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc",
-    "dev": "nodemon --watch views --watch ./src --ext hbs --exec 'ts-node --transpile-only main.ts'",
+    "dev": "nodemon --watch views --watch ./src --ext hbs --exec 'tsc && node build/main.js'",
     "keygen": "node -e \"const c=require('crypto'); const key=c.randomBytes(32).toString('base64url'); const hash=c.createHash('sha256').update(key).digest('hex'); console.log('\\nAPI KEY (put in .env):\\n'+key+'\\n\\nHASH (store on server):\\n'+hash+'\\n');\""
   },
   "keywords": [],

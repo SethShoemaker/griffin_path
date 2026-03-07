@@ -2,20 +2,13 @@ import express, { Request, Response } from "express";
 import { maybeAttachApiKey, requireApiKey } from "../auth/api-key";
 import { sectionSearchFilterType } from "../section-search/filter-type";
 import { queryParamValueArray } from "../helpers/query-params";
-import { getSectionSearchFilters } from "../section-search/filters";
-import { knex } from "../knexfile";
-import { getSectionSearchColumns } from "../section-search/columns";
-import { getSectionsInfo } from "../sections/sections";
+import { sectionSearchCache } from "../section-search/cache"
 
 export const sectionSearchRouter = express.Router();
 
 sectionSearchRouter.get("/sections", maybeAttachApiKey, requireApiKey, async (request: Request, res: Response) => {
 
-    let [columns, filters, sections] = await Promise.all([
-        getSectionSearchColumns(knex),
-        getSectionSearchFilters(knex),
-        getSectionsInfo(knex),
-    ])
+    let { columns, filters, sections } = sectionSearchCache.data!;
 
     for (const filter of filters) {
         switch (filter.type) {
