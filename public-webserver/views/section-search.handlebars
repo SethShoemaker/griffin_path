@@ -6,22 +6,36 @@
             {{#each filters}}
             <div>
                 <label class="label">
-                    <span class="label-text font-semibold">{{this.name}}</span>
+                    <span class="label-text font-semibold">{{this.label}}</span>
                 </label>
 
                 {{#if (eq this.type "text_search")}}
-                <input type="text" name="{{this.slug}}" value="{{lookup ../query this.slug}}"
-                    class="input input-bordered w-full" placeholder="Search {{this.name}}" />
+                <input type="text" name="{{this.inputName}}" value="{{this.value}}"
+                    class="input input-bordered w-full" placeholder="{{this.placeholder}}" />
                 {{/if}}
 
                 {{#if (eq this.type "multi_select_or")}}
-                <select name="{{this.slug}}" multiple class="select select-bordered w-full h-40">
-                    {{#each this.inputOptions}}
-                    <option value="{{ifelse this this 'null'}}" {{#if (includes (lookup ../../query ../slug) this)}}selected{{/if}}>
-                        {{ifelse this this '(none)'}}
-                    </option>
-                    {{/each}}
-                </select>
+                <div class="dropdown w-full">
+                    <div tabindex="0" role="button"
+                        class="input input-bordered w-full flex items-center cursor-pointer">
+                        {{this.placeholder}}
+                    </div>
+
+                    <div tabindex="0"
+                        class="dropdown-content z-[1] mt-1 w-full p-2 shadow bg-base-100 rounded-box border">
+
+                        <select name="{{this.inputName}}" multiple class="select select-ghost w-full">
+
+                            {{#each this.inputOptions}}
+                            <option value="{{this.value}}" {{#if this.selected}}selected{{/if}}>
+                                {{this.label}}
+                            </option>
+                            {{/each}}
+
+                        </select>
+
+                    </div>
+                </div>
                 {{/if}}
             </div>
             {{/each}}
