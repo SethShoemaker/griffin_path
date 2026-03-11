@@ -32,4 +32,4 @@ export const config: { [key: string]: Knex.Config } = {
 };
 export default config;
 
-export const knex = _knex(config["production"]);
+export const knex = _knex(config[process.env.NODE_ENV!]);
