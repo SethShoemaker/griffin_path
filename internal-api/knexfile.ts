@@ -19,6 +19,7 @@ export const config: { [key: string]: Knex.Config } = {
       user: process.env.DB_USER || 'sa',
       password: process.env.DB_PASSWORD || 'sa',
       database: process.env.DB_NAME || 'database',
+      requestTimeout: 600_000,
       options: {
         encrypt: false,
         trustServerCertificate: true
